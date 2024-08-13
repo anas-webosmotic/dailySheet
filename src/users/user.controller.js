@@ -43,18 +43,57 @@ exports.getUsers = async (req, res, next) => {
 
 exports.getUserById = async (req, res, next) => {
   try {
-    const { userId } = req.user;
+    const user = req.user;
+    const { userId } = req.params;
     console.log(req.params.userId);
     console.log(req.user.userId);
 
-    if (userId == req.params.userId) {
+    if (user.userId == userId || user.role == "Admin") {
       const userExist = await USER_MODEL.findOne(
         { _id: userId, isDelete: false },
         { isDelete: 0, __v: 0, password: 0, createdAt: 0 }
-      );
-      res.json(getSuccessResponse("GET USER BY ID", userExist));
+      )
+        .populate("responsibleUsers", "username -_id")
+        .populate("verifierUser", "username -_id");
+      return res.json(getSuccessResponse("GET USER BY ID", userExist));
     }
-    res.send("DIFFERENT ID");
+    return res.json(getFailureResponse(404, "No User Found"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const payload = req.body;
+    const options = { new: true };
+
+    const user = await USER_MODEL.findByIdAndUpdate(userId, payload, options);
+
+    if (user) {
+      const { _id, createdAt, __v, isDelete,password, ...result } = user.toObject();
+      return res.json(getSuccessResponse("User Updated Successfully", result));
+    }
+    return res.json(getFailureResponse(404, "No User Found"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await USER_MODEL.findByIdAndUpdate(userId, {
+      isDelete: true,
+    });
+
+    if (user) {
+      return res.json(getSuccessResponse("User Deleted Successfully"));
+    }
+
+    return res.json(getFailureResponse(404, "No Projects Found"));
   } catch (error) {
     next(error);
   }

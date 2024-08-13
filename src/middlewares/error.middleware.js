@@ -3,6 +3,8 @@ const { getFailureResponse } = require("../utils/response");
 const { ValidationError } = require('express-validation')
 
 exports.errorHandler = (err, req, res, next) => {
+  console.log("=======err========",err);
+  
   const status = err.status || 500;
   const errorMessage = err.message || "Something went wrong";
 
@@ -28,5 +30,6 @@ exports.validationError = function (err, req, res, next){
     const errName = err.name;
     return res.status(err.statusCode).json(getFailureResponse(status, errorMessage, errName));
   }
-  return res.status(500).json(err);
+  // return res.status(500).json(err);
+  next(err);
 }

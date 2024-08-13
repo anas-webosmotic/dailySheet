@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", userRoute);
 app.use("/api", projectRoute);
-app.use("/api", dailySheetRoute);
+app.use("/api/dailySheet/:userId", dailySheetRoute);
 
 app.use(validationError);
 app.use(notFoundHandler);

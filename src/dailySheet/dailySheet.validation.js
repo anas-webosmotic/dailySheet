@@ -32,7 +32,7 @@ const taskCategoryStrings = [
 
 exports.addDailySheetValidation = {
   body: Joi.object({
-    userId: Joi.objectId().required(),
+    // userId: Joi.objectId().required(),
     date: Joi.date().format("DD-MM-YYYY").raw().required(),
     taskCategory: Joi.valid(...taskCategoryStrings).required(),
     project: Joi.objectId().required(),
@@ -42,4 +42,13 @@ exports.addDailySheetValidation = {
     plannedDuration: Joi.number().required(),
     actualDuration: Joi.number().required(),
   }),
+  params: Joi.object({
+    userId:Joi.objectId()
+  })
 };
+
+exports.getDailySheetValidation = {
+  params: Joi.object({
+    userId: Joi.objectId()
+  })
+}

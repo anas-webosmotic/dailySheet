@@ -13,10 +13,7 @@ exports.addProject = async (req, res, next) => {
     });
 
     if (!project) {
-      console.log("Helloo");
-
       const newProject = await PROJECT_MODEL.create(payload);
-      console.log("Hell");
       return res.json(
         getSuccessResponse("Project Created Succesfully", newProject)
       );
@@ -35,12 +32,76 @@ exports.getProjects = async (req, res, next) => {
       { isDelete: 0, __v: 0, createdAt: 0 }
     ).populate("responsibleUsers", "username -_id");
 
-    if (!projects)
-      throw createError(404, getFailureResponse("No Projects Found"));
+    if (!projects) throw createError(404, "No Projects Found");
 
     return res.json(
       getSuccessResponse("All Projects Fetched Successfully", projects)
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getProjectById = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    console.log(`===  exports.getProjectById=  projectId ===>>`, projectId);
+
+    const projects = await PROJECT_MODEL.findOne(
+      { _id: projectId, isDelete: false },
+      { isDelete: 0, __v: 0, createdAt: 0 }
+    ).populate("responsibleUsers", "username -_id");
+    console.log(`===  exports.getProjectById=  projects ===>>`, projects);
+
+    if (!projects) throw createError(404, "No Projects Found");
+
+    return res.json(
+      getSuccessResponse("All Projects Fetched Successfully", projects)
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateProjectById = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    const paylaod = req.body;
+    const options = { new: true };
+
+    const projects = await PROJECT_MODEL.findByIdAndUpdate(
+      projectId,
+      paylaod,
+      options
+    );
+
+    if (projects) {
+      const { _id, createdAt, __v, isDelete, ...result } = projects.toObject();
+      return res.json(
+        getSuccessResponse("Project Updated Successfully", result)
+      );
+    }
+
+    return res.json(getFailureResponse(404, "No Projects Found"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteProjectById = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    console.log(`===  exports.deleteProjectById  projectId ===>>`, projectId);
+
+    const project = await PROJECT_MODEL.findByIdAndUpdate(projectId, {
+      isDelete: true,
+    });
+
+    if (project) {
+      return res.json(getSuccessResponse("Project Deleted Successfully"));
+    }
+
+    return res.json(getFailureResponse(404, "No Projects Found"));
   } catch (error) {
     next(error);
   }

@@ -58,14 +58,115 @@ passport.use(
   )
 );
 
-exports.authorization = (roles) => {
+exports.authorization = () => {
+  return async (req, res, next) => {
+    try {
+      const { userId } = req.params;
+      console.log(`===  return  userId ===>>`, userId);
+
+      const user = await USER_MODEL.findOne({ _id: userId, isDelete: false });
+      console.log(`===  return  user ===>>`, user);
+
+      const userPayload = req.user;
+      console.log(`===  return  userPayload ===>>`, userPayload);
+
+      console.log("====== REQUEST METHOD ======>>>", req.method);
+
+      if (req.method == "GET") {
+        if (
+          userId !== userPayload.userId &&
+          user.verifierUser.toString() !== userPayload.userId &&
+          !user.responsibleUsers.includes(userPayload.userId) &&
+          userPayload.role !== "Admin"
+        ) {
+          throw createError(403, "Not Authorized");
+        }
+      } else if (req.method == "PUT") {
+        if (
+          userId !== userPayload.userId &&
+          user.verifierUser.toString() !== userPayload.userId &&
+          userPayload.role !== "Admin"
+        ) {
+          throw createError(403, "Not Authorized");
+        }
+      } else {
+        if ((userId !== userPayload.userId) & (userPayload.role !== "Admin")) {
+          throw createError(403, "Not Authorized");
+        }
+      }
+      return next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+exports.adminAuthorization = () => {
   return (req, res, next) => {
     try {
       const user = req.user;
-      if(!roles.includes(user.role)) throw createError("Not Authorized");
+      if (user.role !== "Admin") throw createError(403, "Not Authorized");
       next();
     } catch (error) {
       next(error);
     }
   };
 };
+
+exports.userAuthorization = () => {
+  return (req, res, next) => {
+    try {
+      const user = req.user;
+      if (user.role !== "Admin" && user.userId !== req.params.userId)
+        throw createError(403, "Not Authorized");
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+// exports.authorization = () => {
+//   return async (req, res, next) => {
+//     try {
+//       const { userId } = req.params;
+//       console.log(`===  return  userId ===>>`, userId);
+
+//       const user = await USER_MODEL.findOne({ _id: userId, isDelete: false });
+//       console.log(`===  return  user ===>>`, user);
+
+//       const userPayload = req.user;
+//       console.log(`===  return  userPayload ===>>`, userPayload);
+
+//       console.log("====== REQUEST METHOD ======>>>",req.method);
+
+//       if(req.method == "GET"){
+//         if (userId == userPayload.userId) {
+//           return next();
+//         } else if (user.verifierUser.toString() == userPayload.userId) {
+//           console.log("INISDE VERIFIER");
+
+//           return next();
+//         }else if(user.responsibleUsers.includes(userPayload.userId)){
+//           console.log("INISDE RESPONSIBLE");
+//           return next();
+//         }
+//       }else if(req.method == "PUT"){
+//         if (userId == userPayload.userId) {
+//           return next();
+//         } else if (user.verifierUser.toString() !== userPayload.userId) {
+//           return next();
+//         }
+//       }else{
+//         return next();
+//         // if (userId == userPayload.userId) {
+//         // }
+//       }
+//       console.log("HELLOOOo ERORRRRRRRRrrrrrr");
+
+//       throw createError(403,"Not Authorized");
+//     } catch (error) {
+//       next(error);
+//     }
+//   };
+// };

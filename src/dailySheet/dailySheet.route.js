@@ -1,22 +1,27 @@
 const { Router } = require("express");
 const passport = require("passport");
 const { validate } = require("express-validation");
-const {} = require("../middlewares/auth.middleware");
+const { authorization } = require("../middlewares/auth.middleware");
 const { addDailySheet, getDailySheet } = require("./dailySheet.controller");
-const { addDailySheetValidation } = require("./dailySheet.validation");
+const { addDailySheetValidation, getDailySheetValidation } = require("./dailySheet.validation");
 
-const dailySheetRoute = Router();
+const dailySheetRoute = Router({mergeParams: true});
 
 dailySheetRoute.post(
-  "/dailySheet",
+  "/",
+  // "/dailySheet",
   passport.authenticate("jwt", { session: false }),
   validate(addDailySheetValidation),
+  authorization(),
   addDailySheet
 );
 
 dailySheetRoute.get(
-  "/dailySheet/:userId",
+  "/",
+  // "/dailySheet/:userId",
   passport.authenticate("jwt", { session: false }),
+  validate(getDailySheetValidation),
+  authorization(),
   getDailySheet
 );
 
