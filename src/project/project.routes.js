@@ -13,7 +13,7 @@ const {
   addProjectValidation,
   getProjectValidation,
   updateProjectValidation,
-} = require("./project.validaiton");
+} = require("./project.validation");
 
 const projectRoute = Router();
 

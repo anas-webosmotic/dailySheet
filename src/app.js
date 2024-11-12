@@ -1,7 +1,7 @@
 const express = require("express");
-const userRoute = require("./users/user.route");
+const { userRoute } = require("./users/user.routes");
 const { projectRoute } = require("./project/project.routes");
-const { dailySheetRoute } = require("./dailySheet/dailySheet.route");
+const { dailySheetRoute } = require("./dailySheet/dailySheet.routes");
 const { notFoundHandler, errorHandler, validationError } = require("./middlewares/error.middleware");
 
 const app = express();

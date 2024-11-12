@@ -56,4 +56,4 @@ userRoute.delete(
   deleteUserById
 );
 
-module.exports = userRoute;
+exports.userRoute = userRoute;

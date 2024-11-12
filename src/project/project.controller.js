@@ -15,7 +15,7 @@ exports.addProject = async (req, res, next) => {
     if (!project) {
       const newProject = await PROJECT_MODEL.create(payload);
       return res.json(
-        getSuccessResponse("Project Created Succesfully", newProject)
+        getSuccessResponse("Project Created Successfully", newProject)
       );
     }
 
@@ -45,13 +45,11 @@ exports.getProjects = async (req, res, next) => {
 exports.getProjectById = async (req, res, next) => {
   try {
     const { projectId } = req.params;
-    console.log(`===  exports.getProjectById=  projectId ===>>`, projectId);
 
     const projects = await PROJECT_MODEL.findOne(
       { _id: projectId, isDelete: false },
       { isDelete: 0, __v: 0, createdAt: 0 }
     ).populate("responsibleUsers", "username -_id");
-    console.log(`===  exports.getProjectById=  projects ===>>`, projects);
 
     if (!projects) throw createError(404, "No Projects Found");
 
@@ -66,12 +64,12 @@ exports.getProjectById = async (req, res, next) => {
 exports.updateProjectById = async (req, res, next) => {
   try {
     const { projectId } = req.params;
-    const paylaod = req.body;
+    const payload = req.body;
     const options = { new: true };
 
     const projects = await PROJECT_MODEL.findByIdAndUpdate(
       projectId,
-      paylaod,
+      payload,
       options
     );
 
@@ -91,7 +89,6 @@ exports.updateProjectById = async (req, res, next) => {
 exports.deleteProjectById = async (req, res, next) => {
   try {
     const { projectId } = req.params;
-    console.log(`===  exports.deleteProjectById  projectId ===>>`, projectId);
 
     const project = await PROJECT_MODEL.findByIdAndUpdate(projectId, {
       isDelete: true,

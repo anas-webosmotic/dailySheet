@@ -12,7 +12,7 @@ exports.addUser = async (req, res, next) => {
     });
     if (!user) {
       const newUser = await USER_MODEL.create(payload);
-      return res.json(getSuccessResponse("User Created Succesfully", newUser));
+      return res.json(getSuccessResponse("User Created Successfully", newUser));
     }
 
     return res.json(getFailureResponse("User Already Exist"));
@@ -22,7 +22,7 @@ exports.addUser = async (req, res, next) => {
 };
 
 exports.loginUser = async (req, res, next) => {
-  return res.set().json(getSuccessResponse("Login Succesfully", req.user));
+  return res.set().json(getSuccessResponse("Login Successfully", req.user));
 };
 
 exports.getUsers = async (req, res, next) => {
@@ -35,7 +35,7 @@ exports.getUsers = async (req, res, next) => {
       .populate("verifierUser", "username -_id");
     if (!users) throw createError("404", getFailureResponse("No User Found"));
 
-    return res.json(getSuccessResponse("All Users fetched Succesfully", users));
+    return res.json(getSuccessResponse("All Users fetched Successfully", users));
   } catch (error) {
     next(error);
   }
@@ -45,8 +45,6 @@ exports.getUserById = async (req, res, next) => {
   try {
     const user = req.user;
     const { userId } = req.params;
-    console.log(req.params.userId);
-    console.log(req.user.userId);
 
     if (user.userId == userId || user.role == "Admin") {
       const userExist = await USER_MODEL.findOne(
@@ -72,7 +70,7 @@ exports.updateUserById = async (req, res, next) => {
     const user = await USER_MODEL.findByIdAndUpdate(userId, payload, options);
 
     if (user) {
-      const { _id, createdAt, __v, isDelete,password, ...result } = user.toObject();
+      const { _id, createdAt, __v, isDelete, password, ...result } = user.toObject();
       return res.json(getSuccessResponse("User Updated Successfully", result));
     }
     return res.json(getFailureResponse(404, "No User Found"));

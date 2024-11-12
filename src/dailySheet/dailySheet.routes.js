@@ -5,7 +5,7 @@ const { authorization } = require("../middlewares/auth.middleware");
 const { addDailySheet, getDailySheet } = require("./dailySheet.controller");
 const { addDailySheetValidation, getDailySheetValidation } = require("./dailySheet.validation");
 
-const dailySheetRoute = Router({mergeParams: true});
+const dailySheetRoute = Router({ mergeParams: true });
 
 dailySheetRoute.post(
   "/",
